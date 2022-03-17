@@ -9,9 +9,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tcmherb.R
 
-//Replace with your font locations
-val Roboto = FontFamily.Default
-
 val Noto = FontFamily(
     Font(R.font.noto_black, weight = FontWeight.Black),
     Font(R.font.noto_bold, weight = FontWeight.Bold),
