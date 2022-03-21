@@ -3,26 +3,26 @@ package com.example.tcmherb
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,13 +33,14 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfDouble
 import org.opencv.imgproc.Imgproc
-import java.lang.Math.pow
 import java.nio.ByteBuffer
+import kotlin.math.pow
 
 @Composable
 fun CameraScreen(navController: NavController){
@@ -76,7 +77,7 @@ fun CameraView(){
         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
         .build()
 
-    //val imageCapture = ImageCapture.Builder().build()
+    val imageCapture = ImageCapture.Builder().build()
 
     val imageBlurryAnalysis = ImageAnalysis.Builder()
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -96,7 +97,7 @@ fun CameraView(){
             Core.meanStdDev(destination, median, std)
 
             //setting 500 as threshold, the higher the number, the clearer the photo
-            isBlur = pow(std[0, 0][0], 2.0) <= 500
+            isBlur = (std[0, 0][0]).pow(2) <= 500
         }
 
         imageProxy.close()
@@ -105,7 +106,7 @@ fun CameraView(){
     LaunchedEffect(CameraSelector.LENS_FACING_BACK){
         val cameraProvider = ProcessCameraProvider.getInstance(context).get()
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, imageBlurryAnalysis)
+        cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, imageCapture, imageBlurryAnalysis)
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
 
@@ -122,11 +123,17 @@ fun CameraView(){
                 Modifier.fillMaxSize()
             )
             Box(contentAlignment = Alignment.BottomCenter){
-                Surface(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                Button(
+                    onClick = {
+
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
                     border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.surface),
                     shape = RoundedCornerShape(45.dp),
-                    modifier = Modifier.padding(32.dp).wrapContentSize().size(56.dp)
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .wrapContentSize()
+                        .size(56.dp)
                 ){}
             }
         }

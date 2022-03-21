@@ -11,11 +11,11 @@
       "fieldsDescending": {}
     },
     "memoizedSize": -1,
-    "memoizedHashCode": 1366361466
+    "memoizedHashCode": 1414799898
   },
   {
     "level_": 0,
-    "message_": "rebuilding JSON C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\android_gradle_build.json due to:",
+    "message_": "JSON \u0027C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\android_gradle_build.json\u0027 was up-to-date",
     "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
     "tag_": "debug|x86_64",
     "diagnosticCode_": 0,
@@ -25,147 +25,7 @@
       "fieldsDescending": {}
     },
     "memoizedSize": -1,
-    "memoizedHashCode": -590589945
-  },
-  {
-    "level_": 0,
-    "message_": "- expected json C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\android_gradle_build.json file is not present, will remove stale json folder",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": -108230965
-  },
-  {
-    "level_": 0,
-    "message_": "- missing previous command file C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\metadata_generation_command.txt, will remove stale json folder",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 477280137
-  },
-  {
-    "level_": 0,
-    "message_": "- command changed from previous, will remove stale json folder",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 165851525
-  },
-  {
-    "level_": 0,
-    "message_": "removing stale contents from \u0027C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\u0027",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 1426006791
-  },
-  {
-    "level_": 0,
-    "message_": "created folder \u0027C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\u0027",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": -1523944837
-  },
-  {
-    "level_": 0,
-    "message_": "executing cmake Executable : C:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\cmake.exe\narguments : \n-HC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DANDROID_PLATFORM\u003dandroid-21\n-DANDROID_ABI\u003dx86_64\n-DCMAKE_ANDROID_ARCH_ABI\u003dx86_64\n-DANDROID_NDK\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\\build\\cmake\\android.toolchain.cmake\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\ninja.exe\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\build\\intermediates\\cxx\\Debug\\3z2lb4e3\\obj\\x86_64\n-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\build\\intermediates\\cxx\\Debug\\3z2lb4e3\\obj\\x86_64\n-DCMAKE_BUILD_TYPE\u003dDebug\n-BC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\n-GNinja\n-DANDROID_STL\u003dc++_shared\njvmArgs : \n\n",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 203954703
-  },
-  {
-    "level_": 0,
-    "message_": "Executable : C:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\cmake.exe\narguments : \n-HC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DANDROID_PLATFORM\u003dandroid-21\n-DANDROID_ABI\u003dx86_64\n-DCMAKE_ANDROID_ARCH_ABI\u003dx86_64\n-DANDROID_NDK\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_ANDROID_NDK\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\n-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\\build\\cmake\\android.toolchain.cmake\n-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\lukai\\AppData\\Local\\Android\\Sdk\\cmake\\3.18.1\\bin\\ninja.exe\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\build\\intermediates\\cxx\\Debug\\3z2lb4e3\\obj\\x86_64\n-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\build\\intermediates\\cxx\\Debug\\3z2lb4e3\\obj\\x86_64\n-DCMAKE_BUILD_TYPE\u003dDebug\n-BC:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\n-GNinja\n-DANDROID_STL\u003dc++_shared\njvmArgs : \n\n",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": -400424656
-  },
-  {
-    "level_": 0,
-    "message_": "Exiting generation of C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\compile_commands.json.bin normally",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 1935814769
-  },
-  {
-    "level_": 0,
-    "message_": "done executing cmake",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": -146494726
-  },
-  {
-    "level_": 0,
-    "message_": "write command file C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\.cxx\\Debug\\3z2lb4e3\\x86_64\\metadata_generation_command.txt",
-    "file_": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\libcxx_helper\\CMakeLists.txt",
-    "tag_": "debug|x86_64",
-    "diagnosticCode_": 0,
-    "memoizedIsInitialized": 1,
-    "unknownFields": {
-      "fields": {},
-      "fieldsDescending": {}
-    },
-    "memoizedSize": -1,
-    "memoizedHashCode": 1293593617
+    "memoizedHashCode": -1805315842
   },
   {
     "level_": 0,
@@ -179,6 +39,6 @@
       "fieldsDescending": {}
     },
     "memoizedSize": -1,
-    "memoizedHashCode": 1791578358
+    "memoizedHashCode": 1840016790
   }
 ]
