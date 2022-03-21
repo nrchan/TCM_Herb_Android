@@ -8,18 +8,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import android.provider.Settings
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
+import android.util.Log
+import android.util.Rational
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,20 +29,21 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.common.util.concurrent.ListenableFuture
 
 @Composable
 fun CameraScreen(navController: NavController){
-    Box (
-        modifier = Modifier.fillMaxSize()
-    ) {
-        CameraView()
+    Column(Modifier.fillMaxSize()) {
         FilledTonalButton(
             onClick = { navController.navigate("home"){ popUpTo("home") {inclusive = true} } },
-            modifier = Modifier.padding(32.dp)
+            modifier = Modifier.padding(top = 32.dp, start = 32.dp)
         ) {
             Icon(Icons.Rounded.ArrowBack, "back button")
+        }
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            CameraView()
         }
     }
 }
@@ -62,10 +62,33 @@ fun CameraView(){
         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
         .build()
 
+    val imageBlurryAnalysis = ImageAnalysis.Builder()
+        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+        .build()
+    imageBlurryAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), ImageAnalysis.Analyzer { imageProxy ->
+        val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+        // insert your code here.
+        Log.d("Debug", imageProxy.cropRect.flattenToString())
+        // after done, release the ImageProxy object
+        imageProxy.close()
+    })
+
+    val imageCapture = ImageCapture.Builder()
+        .setTargetRotation(LocalConfiguration.current.layoutDirection)
+        .build()
+
+    val viewPort =  ViewPort.Builder(Rational(1, 1), LocalConfiguration.current.layoutDirection).build()
+    val useCaseGroup = UseCaseGroup.Builder()
+        .addUseCase(preview)
+        .addUseCase(imageBlurryAnalysis)
+        .addUseCase(imageCapture)
+        .setViewPort(viewPort)
+        .build()
+
     LaunchedEffect(CameraSelector.LENS_FACING_BACK){
         val cameraProvider = ProcessCameraProvider.getInstance(context).get()
         cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview)
+        cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, useCaseGroup)
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
 
@@ -74,12 +97,11 @@ fun CameraView(){
         Surface(
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxSize()
+                .padding(32.dp)
+                .wrapContentSize()
         ) {
             AndroidView(
-                {previewView},
-                Modifier.fillMaxSize()
+                {previewView}
             )
         }
     }else{
