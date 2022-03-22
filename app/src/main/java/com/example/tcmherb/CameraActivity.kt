@@ -7,6 +7,7 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -121,8 +122,10 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
             val std = MatOfDouble()
             Core.meanStdDev(destination, median, std)
 
-            //setting 500 as threshold, the higher the number, the clearer the photo
-            showBlurWarning((std[0, 0][0]).pow(2) <= 500 && !isSaved)
+            //the higher the number, the clearer the photo
+            val blur = (std[0, 0][0]).pow(2)
+            showBlurWarning(blur <= 60 && !isSaved)
+            Log.d("Blur", blur.toString())
         }
 
         imageProxy.close()
