@@ -3,13 +3,19 @@ package com.example.tcmherb
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import androidx.camera.core.*
+import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +26,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,26 +37,48 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfDouble
 import org.opencv.imgproc.Imgproc
+import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import kotlin.math.pow
 
+
 @Composable
 fun CameraScreen(navController: NavController){
+    var isBlur by remember { mutableStateOf(false) }
+
     Box (
         modifier = Modifier.fillMaxSize()
     ) {
-        CameraView()
-        FilledTonalButton(
-            onClick = { navController.navigate("home"){ popUpTo("home") {inclusive = true} } },
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Icon(Icons.Rounded.ArrowBack, "back button")
+        CameraView(navController, {isBlur = it})
+        Row(modifier = Modifier.padding(32.dp)){
+            FilledTonalButton(
+                onClick = { navController.navigate("home"){ popUpTo("home") {inclusive = true} } },
+            ) {
+                Icon(Icons.Rounded.ArrowBack, "back button")
+            }
+            AnimatedVisibility(
+                visible = isBlur,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                FilledTonalButton(
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                    onClick = {},
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Text("Image is too blurry!",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
         }
     }
 }
@@ -63,13 +89,14 @@ fun CameraScreen(navController: NavController){
     androidx.compose.animation.ExperimentalAnimationApi::class
 )
 @Composable
-fun CameraView(){
+fun CameraView(navController: NavController, onBlurChange: (Boolean) -> Unit){
     Modifier.fillMaxSize()
-
-    var isBlur by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
+    var isSaved by remember { mutableStateOf(false) }
+    val cacheFile = File.createTempFile("testImage", null, context.cacheDir)
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
@@ -77,7 +104,8 @@ fun CameraView(){
         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
         .build()
 
-    val imageCapture = ImageCapture.Builder().build()
+    val imageCapture = ImageCapture.Builder()
+        .build()
 
     val imageBlurryAnalysis = ImageAnalysis.Builder()
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -97,13 +125,13 @@ fun CameraView(){
             Core.meanStdDev(destination, median, std)
 
             //setting 500 as threshold, the higher the number, the clearer the photo
-            isBlur = (std[0, 0][0]).pow(2) <= 500
+            onBlurChange((std[0, 0][0]).pow(2) <= 500)
         }
 
         imageProxy.close()
     }
 
-    LaunchedEffect(CameraSelector.LENS_FACING_BACK){
+    LaunchedEffect(true){
         val cameraProvider = ProcessCameraProvider.getInstance(context).get()
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, imageCapture, imageBlurryAnalysis)
@@ -118,23 +146,44 @@ fun CameraView(){
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxSize()
         ) {
-            AndroidView(
-                {previewView},
-                Modifier.fillMaxSize()
-            )
-            Box(contentAlignment = Alignment.BottomCenter){
-                Button(
-                    onClick = {
-
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
-                    border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(45.dp),
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .wrapContentSize()
-                        .size(56.dp)
-                ){}
+            if(isSaved){
+                val bitmap = BitmapFactory.decodeFile(cacheFile.path)
+                Image(bitmap.asImageBitmap(), "")
+            }else{
+                AndroidView(
+                    {previewView},
+                    Modifier.fillMaxSize()
+                )
+                //shutter
+                Box(contentAlignment = Alignment.BottomCenter){
+                    Button(
+                        onClick = {
+                            imageCapture.takePicture(ContextCompat.getMainExecutor(context),
+                                object : ImageCapture.OnImageCapturedCallback() {
+                                    override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                                        super.onCaptureSuccess(imageProxy)
+                                        imageProxy.image?.let { image ->
+                                            val bitmap = image.toBitmap()
+                                            val out = FileOutputStream(cacheFile)
+                                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                                            out.flush()
+                                            out.close()
+                                        }
+                                        //comment or uncomment this to show image preview
+                                        isSaved = true
+                                        imageProxy.close()
+                                    }
+                                })
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
+                        border = BorderStroke(3.dp, color = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(45.dp),
+                        modifier = Modifier
+                            .padding(32.dp)
+                            .wrapContentSize()
+                            .size(56.dp)
+                    ){}
+                }
             }
         }
     }else{
@@ -178,4 +227,12 @@ private fun convertYUVtoMat(img: Image): Mat {
     Imgproc.cvtColor(yuv, rgb, Imgproc.COLOR_YUV2RGB_NV21, 3)
     Core.rotate(rgb, rgb, Core.ROTATE_90_CLOCKWISE)
     return rgb
+}
+
+fun Image.toBitmap(): Bitmap {
+    val buffer = planes[0].buffer
+    buffer.rewind()
+    val bytes = ByteArray(buffer.capacity())
+    buffer.get(bytes)
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 }

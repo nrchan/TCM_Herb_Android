@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TCM Herb</string>
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_result">ResultActivity</string>
 </resources>

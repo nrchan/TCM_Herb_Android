@@ -29,6 +29,9 @@
     "intermediatesFolder": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb\\opencv\\build\\intermediates\\cxx\\Debug\\3z2lb4e3",
     "isDebuggableEnabled": true,
     "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
       "X86_64"
     ],
     "buildTargetSet": [
@@ -130,7 +133,6 @@
         "rootBuildGradleFolder": "C:\\Users\\lukai\\AndroidStudioProjects\\TCMHerb",
         "sdkFolder": "C:\\Users\\lukai\\AppData\\Local\\Android\\Sdk",
         "isBuildOnlyTargetAbiEnabled": true,
-        "ideBuildTargetAbi": "x86_64,arm64-v8a",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": false
       },
