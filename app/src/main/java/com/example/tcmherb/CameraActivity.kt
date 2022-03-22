@@ -7,19 +7,16 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.camera.core.*
-import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
@@ -50,12 +47,12 @@ import kotlin.math.pow
 
 @Composable
 fun CameraScreen(navController: NavController){
-    var isBlur by remember { mutableStateOf(false) }
+    var showBlurWarning by remember { mutableStateOf(false) }
 
     Box (
         modifier = Modifier.fillMaxSize()
     ) {
-        CameraView(navController, {isBlur = it})
+        CameraView(navController) { showBlurWarning = it }
         Row(modifier = Modifier.padding(32.dp)){
             FilledTonalButton(
                 onClick = { navController.navigate("home"){ popUpTo("home") {inclusive = true} } },
@@ -63,7 +60,7 @@ fun CameraScreen(navController: NavController){
                 Icon(Icons.Rounded.ArrowBack, "back button")
             }
             AnimatedVisibility(
-                visible = isBlur,
+                visible = showBlurWarning,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -72,7 +69,7 @@ fun CameraScreen(navController: NavController){
                     onClick = {},
                     modifier = Modifier.padding(start = 16.dp)
                 ) {
-                    Text("Image is too blurry!",
+                    Text("\uD83E\uDD75 Image is blurry!",
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -89,7 +86,7 @@ fun CameraScreen(navController: NavController){
     androidx.compose.animation.ExperimentalAnimationApi::class
 )
 @Composable
-fun CameraView(navController: NavController, onBlurChange: (Boolean) -> Unit){
+fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit){
     Modifier.fillMaxSize()
 
     val context = LocalContext.current
@@ -125,7 +122,7 @@ fun CameraView(navController: NavController, onBlurChange: (Boolean) -> Unit){
             Core.meanStdDev(destination, median, std)
 
             //setting 500 as threshold, the higher the number, the clearer the photo
-            onBlurChange((std[0, 0][0]).pow(2) <= 500)
+            showBlurWarning((std[0, 0][0]).pow(2) <= 500 && !isSaved)
         }
 
         imageProxy.close()
@@ -163,7 +160,10 @@ fun CameraView(navController: NavController, onBlurChange: (Boolean) -> Unit){
                                     override fun onCaptureSuccess(imageProxy: ImageProxy) {
                                         super.onCaptureSuccess(imageProxy)
                                         imageProxy.image?.let { image ->
-                                            val bitmap = image.toBitmap()
+                                            var bitmap = image.toBitmap()
+                                            val matrix = Matrix()
+                                            matrix.postRotate(90f)
+                                            bitmap =  Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
                                             val out = FileOutputStream(cacheFile)
                                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
                                             out.flush()
