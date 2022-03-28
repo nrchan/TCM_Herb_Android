@@ -39,6 +39,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -107,7 +108,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     val coroutineScope = rememberCoroutineScope()
 
     var isSaved by remember { mutableStateOf(false) }
-    val cacheFile = File.createTempFile("testImage", null, context.cacheDir)
+    var resultType by remember { mutableStateOf(-1) }
+
+    val serverAgent = ServerAgent()
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
@@ -151,23 +154,25 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
         preview.setSurfaceProvider(previewView.surfaceProvider)
 
         launch(Dispatchers.IO) {
-            val serverAgent = ServerAgent()
             serverAgent.helloWorld()
         }
     }
 
     if(cameraPermissionState.status.isGranted){
+        val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         //If permission granted
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxSize()
-        ) {
-            if(isSaved){
-                val bitmap = BitmapFactory.decodeFile(cacheFile.path)
-                Image(bitmap.asImageBitmap(), "")
-            } else {
+        ModalBottomSheetLayout(
+            sheetState = state,
+            sheetContent = {
+                Text(resultType.toString())
+            }
+        ){
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxSize()
+            ) {
                 AndroidView(
                     {previewView},
                     Modifier.fillMaxSize()
@@ -185,19 +190,15 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                             val matrix = Matrix()
                                             matrix.postRotate(90f)
                                             bitmap = Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
-                                            val out = FileOutputStream(cacheFile)
-                                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                                            out.flush()
-                                            out.close()
 
                                             coroutineScope.launch(Dispatchers.IO) {
-                                                val serverAgent = ServerAgent()
                                                 val result = serverAgent.testImage(bitmap)
                                                 Log.d("Connection result", "May be X${result[0].first}")
+                                                resultType = result[0].first
+                                                isSaved = true
+                                                coroutineScope.launch(Dispatchers.Default) { state.show() }
                                             }
                                         }
-                                        //comment or uncomment this to show image preview
-                                        isSaved = true
                                         imageProxy.close()
                                     }
                                 })

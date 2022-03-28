@@ -11,7 +11,7 @@ import java.net.URLEncoder
 
 
 class ServerAgent {
-    val indexToXIndex = intArrayOf(1,10,11,12,13,14,15,16,17,18,19,2,20,21,22,23,24,25,26,27,28,29,3,30,31,32,33,34,35,36,37,38,39,4,40,41,5,6,7,8,9)
+    private val indexToXIndex = intArrayOf(1,10,11,12,13,14,15,16,17,18,19,2,20,21,22,23,24,25,26,27,28,29,3,30,31,32,33,34,35,36,37,38,39,4,40,41,5,6,7,8,9)
 
     private val helloWorldURL = URL("https://herb-server-mj26pnawdq-uc.a.run.app/")
     private val testURL = URL("https://herb-server-mj26pnawdq-uc.a.run.app/test")
@@ -52,14 +52,15 @@ class ServerAgent {
             connection.setRequestProperty("Accept", "text/plain")
             connection.setChunkedStreamingMode(0)
 
+            Log.d("Connection", "Sending image")
             val jsonParam = JSONObject()
             jsonParam.put("image", encodedBitmap)
-
             val out = DataOutputStream(connection.outputStream)
             out.writeBytes(jsonParam.toString())
             out.flush()
             out.close()
 
+            Log.d("Connection", "Reading response")
             val rd = BufferedReader(InputStreamReader(connection.inputStream))
             var result = ""
             rd.use {
@@ -69,6 +70,7 @@ class ServerAgent {
             }
             rd.close()
 
+            Log.d("Connection", "Parsing response")
             val response = JSONObject(result)
             val index = response.getJSONArray("result index")
             val confidence = response.getJSONArray("result confidence")
