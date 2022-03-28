@@ -54,6 +54,9 @@ fun MainScreen(navController: NavController){
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
+    val serverAgent = ServerAgent()
+
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {

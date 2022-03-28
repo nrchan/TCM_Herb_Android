@@ -1,6 +1,7 @@
 package com.example.tcmherb
 
 import android.Manifest
+import android.R.attr.x
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.*
@@ -16,25 +17,33 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -84,7 +93,8 @@ fun CameraScreen(navController: NavController){
 @SuppressLint("UnsafeOptInUsageError")
 @OptIn(
     ExperimentalPermissionsApi::class,
-    androidx.compose.animation.ExperimentalAnimationApi::class
+    androidx.compose.animation.ExperimentalAnimationApi::class,
+    androidx.compose.material.ExperimentalMaterialApi::class
 )
 @Composable
 fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit){
@@ -98,6 +108,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
+
     val cameraSelector = CameraSelector.Builder()
         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
         .build()
@@ -125,7 +136,6 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
             //the higher the number, the clearer the photo
             val blur = (std[0, 0][0]).pow(2)
             showBlurWarning(blur <= 60 && !isSaved)
-            Log.d("Blur", blur.toString())
         }
 
         imageProxy.close()
@@ -136,6 +146,11 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
         cameraProvider.unbindAll()
         cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, imageCapture, imageBlurryAnalysis)
         preview.setSurfaceProvider(previewView.surfaceProvider)
+
+        launch(Dispatchers.IO) {
+            val serverAgent = ServerAgent()
+            serverAgent.helloWorld()
+        }
     }
 
     if(cameraPermissionState.status.isGranted){
@@ -149,7 +164,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
             if(isSaved){
                 val bitmap = BitmapFactory.decodeFile(cacheFile.path)
                 Image(bitmap.asImageBitmap(), "")
-            }else{
+            } else {
                 AndroidView(
                     {previewView},
                     Modifier.fillMaxSize()
