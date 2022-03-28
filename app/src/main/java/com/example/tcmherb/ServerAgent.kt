@@ -7,7 +7,6 @@ import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 
 
 class ServerAgent {
@@ -55,35 +54,36 @@ class ServerAgent {
             Log.d("Connection", "Sending image")
             val jsonParam = JSONObject()
             jsonParam.put("image", encodedBitmap)
-            val out = DataOutputStream(connection.outputStream)
-            out.writeBytes(jsonParam.toString())
+            val out = BufferedOutputStream(connection.outputStream)
+            out.write(jsonParam.toString().toByteArray())
             out.flush()
             out.close()
 
             Log.d("Connection", "Reading response")
             val rd = BufferedReader(InputStreamReader(connection.inputStream))
-            var result = ""
+            val sb = StringBuilder()
             rd.use {
                 it.lines().forEach {
-                    result += it
+                    sb.append(it)
                 }
             }
             rd.close()
 
             Log.d("Connection", "Parsing response")
-            val response = JSONObject(result)
+            val response = JSONObject(sb.toString())
             val index = response.getJSONArray("result index")
             val confidence = response.getJSONArray("result confidence")
             for (i in 0 until index.length()-1){
                 parsedResult.add(Pair(indexToXIndex[index.getInt(i)], confidence.getDouble(i)))
             }
 
-            Log.d("Connection result", result)
+            Log.d("Connection result", response.toString())
         } catch (e: Exception) {
             Log.e("Connection Error","$e")
         } finally {
             connection.disconnect()
         }
+        if(parsedResult.isEmpty()) parsedResult.add(Pair(-1,0.0))
         return parsedResult
     }
 }
