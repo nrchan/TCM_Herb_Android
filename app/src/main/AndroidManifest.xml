@@ -23,11 +23,13 @@
             android:name=".CameraActivity"
             android:exported="false"
             android:label="@string/title_activity_camera"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.TCMHerb" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.TCMHerb">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

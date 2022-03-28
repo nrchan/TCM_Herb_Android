@@ -1,7 +1,6 @@
 package com.example.tcmherb
 
 import android.Manifest
-import android.R.attr.x
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.*
@@ -16,8 +15,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
@@ -29,30 +26,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.MatOfDouble
 import org.opencv.imgproc.Imgproc
-import java.io.File
-import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import kotlin.math.pow
 
@@ -107,6 +97,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
     val coroutineScope = rememberCoroutineScope()
 
+    val herbData = HerbData()
+
     var isSaved by remember { mutableStateOf(false) }
     var resultType by remember { mutableStateOf(-1) }
 
@@ -141,6 +133,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
             //the higher the number, the clearer the photo
             val blur = (std[0, 0][0]).pow(2)
+            //Log.d("Blur", "$blur $isSaved")
             showBlurWarning(blur <= 60 && !isSaved)
         }
 
@@ -159,12 +152,34 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     }
 
     if(cameraPermissionState.status.isGranted){
-        val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+        val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, confirmStateChange = {
+            if(it == ModalBottomSheetValue.Hidden){
+                isSaved = false
+            }
+            true
+        })
+
         //If permission granted
         ModalBottomSheetLayout(
+            sheetBackgroundColor = MaterialTheme.colorScheme.background,
+            sheetShape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp),
             sheetState = state,
             sheetContent = {
-                Text(resultType.toString())
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Looks like...", style = MaterialTheme.typography.bodyLarge)
+                    Text(if(resultType!=-1)herbData.nameZH(resultType) else "Please wait...", style = MaterialTheme.typography.displayMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {}, enabled = isSaved) { Text("Learn more") }
+                    Button(onClick = {
+                        coroutineScope.launch(Dispatchers.Default) { state.hide() }
+                        isSaved = false
+                    }) { Text("New photo") }
+                }
             }
         ){
             Surface(
@@ -186,6 +201,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                     override fun onCaptureSuccess(imageProxy: ImageProxy) {
                                         super.onCaptureSuccess(imageProxy)
                                         imageProxy.image?.let { image ->
+                                            coroutineScope.launch(Dispatchers.Default) { state.show() }
+                                            resultType = -1
                                             var bitmap = image.toBitmap()
                                             val matrix = Matrix()
                                             matrix.postRotate(90f)
@@ -196,7 +213,6 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                                 Log.d("Connection result", "May be X${result[0].first}")
                                                 resultType = result[0].first
                                                 isSaved = true
-                                                coroutineScope.launch(Dispatchers.Default) { state.show() }
                                             }
                                         }
                                         imageProxy.close()
