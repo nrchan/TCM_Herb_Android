@@ -43,6 +43,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.opencv.core.Core
 import org.opencv.core.CvType
@@ -102,6 +103,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
+    val coroutineScope = rememberCoroutineScope()
 
     var isSaved by remember { mutableStateOf(false) }
     val cacheFile = File.createTempFile("testImage", null, context.cacheDir)
@@ -181,11 +184,17 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                             var bitmap = image.toBitmap()
                                             val matrix = Matrix()
                                             matrix.postRotate(90f)
-                                            bitmap =  Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
+                                            bitmap = Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
                                             val out = FileOutputStream(cacheFile)
                                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
                                             out.flush()
                                             out.close()
+
+                                            coroutineScope.launch(Dispatchers.IO) {
+                                                val serverAgent = ServerAgent()
+                                                val result = serverAgent.testImage(bitmap)
+                                                Log.d("Connection result", "May be X${result[0].first}")
+                                            }
                                         }
                                         //comment or uncomment this to show image preview
                                         isSaved = true

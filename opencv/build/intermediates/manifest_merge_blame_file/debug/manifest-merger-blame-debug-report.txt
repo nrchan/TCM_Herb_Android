@@ -5,7 +5,7 @@
 5    <uses-sdk
 6        android:minSdkVersion="21"
 6-->C:\Users\lukai\AndroidStudioProjects\TCMHerb\opencv\java\AndroidManifest.xml
-7        android:targetSdkVersion="26" />
+7        android:targetSdkVersion="31" />
 7-->C:\Users\lukai\AndroidStudioProjects\TCMHerb\opencv\java\AndroidManifest.xml
 8
 9</manifest>
