@@ -133,9 +133,15 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         .fillMaxWidth()
                 ) {
                     Text("Looks like...", style = MaterialTheme.typography.bodyLarge)
-                    Text(if(resultType!=-1)herbData.nameZH(resultType) else "Please wait...", style = MaterialTheme.typography.displayMedium)
+                    Text(
+                        if(resultType!=-1)herbData.nameZH(resultType) else "Please wait...",
+                        style = MaterialTheme.typography.displayMedium,
+                        color = if(resultType!=-1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
+                        coroutineScope.launch(Dispatchers.Default) { state.hide() }
+                        isSaved = false
                         navController.navigate("detail/$resultType")
                     }, enabled = isSaved) { Text("Learn more") }
                     Button(onClick = {

@@ -69,6 +69,10 @@ fun MainScreen(navController: NavController){
         modifier = Modifier.fillMaxSize()
     ) {
         Button(
+            onClick = { navController.navigate("detail/3") },
+            modifier = Modifier
+        ) { Text("Testing", style = MaterialTheme.typography.bodyMedium) }
+        Button(
             onClick = {
                 if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
                 navController.navigate("camera")
