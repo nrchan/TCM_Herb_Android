@@ -99,57 +99,18 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
     val herbData = HerbData()
 
+    val cameraProviderFuture = remember(context){ ProcessCameraProvider.getInstance(context) }
+    var cameraProvider = remember(cameraProviderFuture) { cameraProviderFuture.get() }
+    var cameraSelector: CameraSelector? by remember { mutableStateOf(null) }
+    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+    var imageBlurryAnalysis: ImageAnalysis? by remember { mutableStateOf(null) }
+    val executor = remember(context) { ContextCompat.getMainExecutor(context) }
+    var preview by remember { mutableStateOf<Preview?>(null) }
+
     var isSaved by remember { mutableStateOf(false) }
     var resultType by remember { mutableStateOf(-1) }
 
     val serverAgent = ServerAgent()
-
-    val preview = Preview.Builder().build()
-    val previewView = remember { PreviewView(context) }
-
-    val cameraSelector = CameraSelector.Builder()
-        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-        .build()
-
-    val imageCapture = ImageCapture.Builder()
-        .build()
-
-    val imageBlurryAnalysis = ImageAnalysis.Builder()
-        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        .build()
-
-    imageBlurryAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
-        imageProxy.image?.let {
-            val matImage = convertYUVtoMat(it)
-
-            //use laplacian kernel to convolve in order to detect blurry image
-            val destination = Mat()
-            val matGray = Mat()
-            Imgproc.cvtColor(matImage, matGray, Imgproc.COLOR_BGR2GRAY)
-            Imgproc.Laplacian(matGray, destination, 3)
-            val median = MatOfDouble()
-            val std = MatOfDouble()
-            Core.meanStdDev(destination, median, std)
-
-            //the higher the number, the clearer the photo
-            val blur = (std[0, 0][0]).pow(2)
-            //Log.d("Blur", "$blur $isSaved")
-            showBlurWarning(blur <= 60 && !isSaved)
-        }
-
-        imageProxy.close()
-    }
-
-    LaunchedEffect(true){
-        val cameraProvider = ProcessCameraProvider.getInstance(context).get()
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, imageCapture, imageBlurryAnalysis)
-        preview.setSurfaceProvider(previewView.surfaceProvider)
-
-        launch(Dispatchers.IO) {
-            serverAgent.helloWorld()
-        }
-    }
 
     if(cameraPermissionState.status.isGranted){
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, confirmStateChange = {
@@ -191,7 +152,53 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                     .fillMaxSize()
             ) {
                 AndroidView(
-                    factory = {
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx)
+
+                        cameraProviderFuture.addListener({
+                            cameraSelector = CameraSelector.Builder()
+                                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                                .build()
+
+                            imageCapture = ImageCapture.Builder()
+                                .build()
+
+                            imageBlurryAnalysis = ImageAnalysis.Builder()
+                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                .build()
+
+                            imageBlurryAnalysis!!.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
+                                imageProxy.image?.let {
+                                    val matImage = convertYUVtoMat(it)
+
+                                    //use laplacian kernel to convolve in order to detect blurry image
+                                    val destination = Mat()
+                                    val matGray = Mat()
+                                    Imgproc.cvtColor(matImage, matGray, Imgproc.COLOR_BGR2GRAY)
+                                    Imgproc.Laplacian(matGray, destination, 3)
+                                    val median = MatOfDouble()
+                                    val std = MatOfDouble()
+                                    Core.meanStdDev(destination, median, std)
+
+                                    //the higher the number, the clearer the photo
+                                    val blur = (std[0, 0][0]).pow(2)
+                                    //Log.d("Blur", "$blur $isSaved")
+                                    showBlurWarning(blur <= 60 && !isSaved)
+                                }
+
+                                imageProxy.close()
+                            }
+
+                            cameraProvider = ProcessCameraProvider.getInstance(context).get()
+                            cameraProvider.unbindAll()
+                            cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageBlurryAnalysis)
+
+                            coroutineScope.launch(Dispatchers.Default) { serverAgent.helloWorld() }
+                        }, executor)
+
+                        preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
                         previewView
                     },
                     modifier = Modifier.fillMaxSize()
@@ -200,7 +207,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                 Box(contentAlignment = Alignment.BottomCenter){
                     Button(
                         onClick = {
-                            imageCapture.takePicture(ContextCompat.getMainExecutor(context),
+                            imageCapture?.takePicture(ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageCapturedCallback() {
                                     override fun onCaptureSuccess(imageProxy: ImageProxy) {
                                         super.onCaptureSuccess(imageProxy)
