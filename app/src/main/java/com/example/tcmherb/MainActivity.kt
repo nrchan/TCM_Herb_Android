@@ -17,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.tcmherb.ui.theme.TCMHerbTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -41,6 +43,12 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") { MainScreen(navController) }
                         composable("camera") { CameraScreen(navController) }
+                        composable(
+                            "detail/{herbType}",
+                            arguments = listOf(navArgument(name = "herbType") {
+                                type = NavType.IntType
+                            })
+                        ) { entry -> DetailScreen(navController, entry.arguments?.getInt("herbType")) }
                     }
                 }
             }

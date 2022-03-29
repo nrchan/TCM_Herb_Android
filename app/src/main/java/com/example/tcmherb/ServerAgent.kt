@@ -54,7 +54,7 @@ class ServerAgent {
                 .post(body)
                 .build()
 
-            Log.d("Connection", "Sending image")
+            Log.d("Connection", "Sending and classifying image")
             val result = client.newCall(request).execute()
 
             Log.d("Connection", "Reading and parsing response")

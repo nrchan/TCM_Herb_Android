@@ -20,6 +20,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TCMHerb">
         <activity
+            android:name=".DetailActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail"
+            android:theme="@style/Theme.TCMHerb" />
+        <activity
             android:name=".CameraActivity"
             android:exported="false"
             android:label="@string/title_activity_camera"

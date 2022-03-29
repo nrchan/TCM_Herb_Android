@@ -174,7 +174,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                     Text("Looks like...", style = MaterialTheme.typography.bodyLarge)
                     Text(if(resultType!=-1)herbData.nameZH(resultType) else "Please wait...", style = MaterialTheme.typography.displayMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = {}, enabled = isSaved) { Text("Learn more") }
+                    Button(onClick = {
+                        navController.navigate("detail/$resultType")
+                    }, enabled = isSaved) { Text("Learn more") }
                     Button(onClick = {
                         coroutineScope.launch(Dispatchers.Default) { state.hide() }
                         isSaved = false
@@ -189,8 +191,10 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                     .fillMaxSize()
             ) {
                 AndroidView(
-                    {previewView},
-                    Modifier.fillMaxSize()
+                    factory = {
+                        previewView
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
                 //shutter
                 Box(contentAlignment = Alignment.BottomCenter){
