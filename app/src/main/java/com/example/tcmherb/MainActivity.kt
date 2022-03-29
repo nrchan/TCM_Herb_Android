@@ -4,10 +4,9 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,6 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -62,16 +65,10 @@ fun MainScreen(navController: NavController){
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
-    val serverAgent = ServerAgent()
-
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Button(
-            onClick = { navController.navigate("detail/3") },
-            modifier = Modifier
-        ) { Text("Testing", style = MaterialTheme.typography.bodyMedium) }
+        HerbCard(herbType = 1)
         Button(
             onClick = {
                 if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
@@ -84,5 +81,25 @@ fun MainScreen(navController: NavController){
         ) {
             Text("Identify", style = MaterialTheme.typography.bodyMedium)
         }
+    }
+}
+
+@Composable
+fun HerbCard(herbType: Int){
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.wrapContentSize()
+    ){
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier
+                .padding(24.dp)
+                .size(64.dp)
+        ){}
+        Image(
+            painterResource(LocalContext.current.resources.getIdentifier("x${herbType}r", "drawable", LocalContext.current.packageName)), "", contentScale = ContentScale.Fit,
+            modifier = Modifier.size(120.dp)
+        )
     }
 }
