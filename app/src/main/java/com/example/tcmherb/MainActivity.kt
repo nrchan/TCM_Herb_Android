@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -69,28 +71,49 @@ fun MainScreen(navController: NavController){
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        HerbCard(herbType = 2)
-        Button(
-            onClick = {
-                if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
-                navController.navigate("camera")
-            },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(32.dp)
-                .fillMaxWidth()
-        ) {
-            Text("Identify", style = MaterialTheme.typography.bodyMedium)
+        Box(modifier = Modifier.align(Alignment.BottomCenter)){
+            Column() {
+                Text(
+                    "Explore",
+                    style = MaterialTheme.typography.displayMedium,
+                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 32.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ){
+                    items(41){ index ->
+                        HerbCard(navController,index+1)
+                    }
+                }
+                Spacer(Modifier.height(48.dp))
+                Button(
+                    onClick = {
+                        if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
+                        navController.navigate("camera")
+                    },
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Identify", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
         }
     }
 }
 
 @Composable
-fun HerbCard(herbType: Int){
+fun HerbCard(navController: NavController, herbType: Int){
     val herbData = HerbData()
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.wrapContentSize()
+        modifier = Modifier
+            .wrapContentSize()
+            .clickable {
+                navController.navigate("detail/$herbType")
+            }
     ){
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -101,14 +124,19 @@ fun HerbCard(herbType: Int){
         ){}
         Image(
             painterResource(LocalContext.current.resources.getIdentifier("x${herbType}r", "drawable", LocalContext.current.packageName)), "", contentScale = ContentScale.Fit,
-            modifier = Modifier.size(80.dp).align(Alignment.TopStart).offset((-8).dp)
+            modifier = Modifier
+                .size(85.dp)
+                .align(Alignment.TopStart)
+                .offset((-8).dp, 4.dp)
         )
         Text(
             herbData.nameZHnl(herbType),
             textAlign = TextAlign.End,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
-            modifier = Modifier.align(Alignment.BottomEnd).offset(0.dp, (-16).dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset((-4).dp, (-16).dp)
         )
     }
 }
