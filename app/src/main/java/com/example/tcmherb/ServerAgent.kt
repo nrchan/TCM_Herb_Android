@@ -3,10 +3,13 @@ package com.example.tcmherb
 import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Log
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import java.io.*
-import java.net.HttpURLConnection
+import java.io.ByteArrayOutputStream
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 
 class ServerAgent {
@@ -16,73 +19,57 @@ class ServerAgent {
     private val testURL = URL("https://herb-server-mj26pnawdq-uc.a.run.app/test")
 
     fun helloWorld(){
-        val connection = helloWorldURL.openConnection() as HttpURLConnection
+        val client = OkHttpClient.Builder()
+            .connectTimeout(100, TimeUnit.SECONDS)
+            .build()
+
         try {
-            Log.d("Connection started", "connection started")
-            val rd = BufferedReader(InputStreamReader(connection.inputStream))
-            var result = ""
-            rd.use {
-                it.lines().forEach {
-                    result += it
-                }
-            }
-            rd.close()
-            Log.d("Connection result", result)
+            val request: Request = Request.Builder()
+                .url(helloWorldURL)
+                .build()
+            val result = client.newCall(request).execute()
+            result.body?.let { Log.d("Connection result", it.string()) }
         } catch (e: Exception) {
             Log.e("Connection Error","$e")
-        } finally {
-            connection.disconnect()
         }
     }
 
     fun testImage(bitmap: Bitmap) : ArrayList<Pair<Int,Double>>{
         val parsedResult = ArrayList<Pair<Int,Double>>()
 
-        val byteArrayOS = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOS)
-        val encodedBitmap = Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT)
-
-        val connection = testURL.openConnection() as HttpURLConnection
+        val client = OkHttpClient()
         try {
-            Log.d("Connection started", "image connection started")
-            connection.doInput = true
-            connection.doOutput = true
-            connection.setRequestProperty("Content-type", "application/json")
-            connection.setRequestProperty("Accept", "text/plain")
-            connection.setChunkedStreamingMode(0)
+            Log.d("Connection", "Processing image")
+            val byteArrayOS = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOS)
+            val encodedBitmap = Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT)
 
-            Log.d("Connection", "Sending image")
             val jsonParam = JSONObject()
             jsonParam.put("image", encodedBitmap)
-            val out = BufferedOutputStream(connection.outputStream)
-            out.write(jsonParam.toString().toByteArray())
-            out.flush()
-            out.close()
+            val JSON = "application/json; charset=utf-8".toMediaType()
+            val body: RequestBody = jsonParam.toString().toRequestBody(JSON)
 
-            Log.d("Connection", "Reading response")
-            val rd = BufferedReader(InputStreamReader(connection.inputStream))
-            val sb = StringBuilder()
-            rd.use {
-                it.lines().forEach {
-                    sb.append(it)
+            val request: Request = Request.Builder()
+                .url(testURL)
+                .post(body)
+                .build()
+
+            Log.d("Connection", "Sending image")
+            val result = client.newCall(request).execute()
+
+            Log.d("Connection", "Reading and parsing response")
+            result.body?.let {
+                val response = JSONObject(it.string())
+                val index = response.getJSONArray("result index")
+                val confidence = response.getJSONArray("result confidence")
+                for (i in 0 until index.length()-1){
+                    parsedResult.add(Pair(indexToXIndex[index.getInt(i)], confidence.getDouble(i)))
                 }
             }
-            rd.close()
-
-            Log.d("Connection", "Parsing response")
-            val response = JSONObject(sb.toString())
-            val index = response.getJSONArray("result index")
-            val confidence = response.getJSONArray("result confidence")
-            for (i in 0 until index.length()-1){
-                parsedResult.add(Pair(indexToXIndex[index.getInt(i)], confidence.getDouble(i)))
-            }
-
-            Log.d("Connection result", response.toString())
         } catch (e: Exception) {
             Log.e("Connection Error","$e")
-        } finally {
-            connection.disconnect()
         }
+
         if(parsedResult.isEmpty()) parsedResult.add(Pair(-1,0.0))
         return parsedResult
     }
