@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -68,7 +69,7 @@ fun MainScreen(navController: NavController){
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        HerbCard(herbType = 1)
+        HerbCard(herbType = 2)
         Button(
             onClick = {
                 if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
@@ -86,6 +87,7 @@ fun MainScreen(navController: NavController){
 
 @Composable
 fun HerbCard(herbType: Int){
+    val herbData = HerbData()
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.wrapContentSize()
@@ -94,12 +96,19 @@ fun HerbCard(herbType: Int){
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.secondaryContainer,
             modifier = Modifier
-                .padding(24.dp)
-                .size(64.dp)
+                .padding(8.dp)
+                .size(100.dp)
         ){}
         Image(
             painterResource(LocalContext.current.resources.getIdentifier("x${herbType}r", "drawable", LocalContext.current.packageName)), "", contentScale = ContentScale.Fit,
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(80.dp).align(Alignment.TopStart).offset((-8).dp)
+        )
+        Text(
+            herbData.nameZHnl(herbType),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.align(Alignment.BottomEnd).offset(0.dp, (-16).dp)
         )
     }
 }

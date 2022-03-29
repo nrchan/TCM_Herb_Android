@@ -3,6 +3,8 @@ package com.example.tcmherb
 class HerbData {
     fun nameZH(index: Int) = herbNameChinese[if(index < 0) 0 else index]
 
+    fun nameZHnl(index: Int) = herbNameChinese_newline[if(index < 0) 0 else index]
+
     fun nameEN(index: Int) = herbNameEnglish[if(index < 0) 0 else index]
 
     fun nameSC(index: Int) = scientificName[if(index < 0) 0 else index]
@@ -43,6 +45,51 @@ class HerbData {
         "烏藥",
         "銅陵鳳丹皮",
         "寧夏枸杞",
+        "荳蔻",
+        "茯苓",
+        "桂枝",
+        "懷菊花",
+        "白參",
+        "北黃耆",
+        "知母",
+        "生地黃",
+        "骨碎補",
+        "薏仁",
+        "桑寄生"
+    )
+
+    private val herbNameChinese_newline = arrayOf(
+        "中文名稱",
+        "黃苓",//黃芩?
+        "熟地黃",
+        "黨參",
+        "甘草",
+        "懷牛膝",
+        "麥門冬",
+        "白术",
+        "野葛",
+        "桑白皮",
+        "桔梗",
+        "山茱萸",
+        "何首烏",
+        "赤芍",
+        "桂皮",
+        "岷當歸",
+        "川芎",
+        "川紅花",
+        "枳實",
+        "紅棗",
+        "細辛根",
+        "連翹",
+        "懷山藥",
+        "款冬花",
+        "乾薑",
+        "袍附子",//炮附子?
+        "桃仁",
+        "紫苑",
+        "烏藥",
+        "銅陵\n鳳丹皮",
+        "寧夏\n枸杞",
         "荳蔻",
         "茯苓",
         "桂枝",
