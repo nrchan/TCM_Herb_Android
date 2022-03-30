@@ -220,10 +220,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                         imageProxy.image?.let { image ->
                                             coroutineScope.launch(Dispatchers.Default) { state.show() }
                                             resultType = -1
-                                            var bitmap = image.toBitmap()
-                                            val matrix = Matrix()
-                                            matrix.postRotate(90f)
-                                            bitmap = Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
+                                            val bitmap = image.toBitmap()
 
                                             coroutineScope.launch(Dispatchers.IO) {
                                                 val result = serverAgent.testImage(bitmap)

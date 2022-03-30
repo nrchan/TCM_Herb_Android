@@ -21,6 +21,7 @@ class ServerAgent {
     fun helloWorld(){
         val client = OkHttpClient.Builder()
             .connectTimeout(100, TimeUnit.SECONDS)
+            .readTimeout(100, TimeUnit.SECONDS)
             .build()
 
         try {
@@ -37,7 +38,11 @@ class ServerAgent {
     fun testImage(bitmap: Bitmap) : ArrayList<Pair<Int,Double>>{
         val parsedResult = ArrayList<Pair<Int,Double>>()
 
-        val client = OkHttpClient()
+        val client = OkHttpClient.Builder()
+            .connectTimeout(100, TimeUnit.SECONDS)
+            .writeTimeout(100, TimeUnit.SECONDS)
+            .readTimeout(100, TimeUnit.SECONDS)
+            .build()
         try {
             Log.d("Connection", "Processing image")
             val byteArrayOS = ByteArrayOutputStream()
