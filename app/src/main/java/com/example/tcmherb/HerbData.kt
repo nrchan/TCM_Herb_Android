@@ -174,7 +174,7 @@ class HerbData {
         "Dioscorea oppoita THUNB.",
         "Tussilago farfara LINN.",
         "ZINGIBERIS RHIZOMA",
-        "ACONITI　LATERALIS　RADIX",
+        "ACONITI LATERALIS RADIX",
         "Prunus persica (L)BATSCH",
         "Aster tataricus L. f.",
         "Lindera strychnifolia(SIEB. et ZUCC.)F.VILLARS",

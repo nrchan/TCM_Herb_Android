@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +37,7 @@ import com.example.tcmherb.ui.theme.TCMHerbTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.opencv.android.OpenCVLoader
 
 class MainActivity : ComponentActivity(), CameraXConfig.Provider {
@@ -57,7 +60,9 @@ class MainActivity : ComponentActivity(), CameraXConfig.Provider {
                             arguments = listOf(navArgument(name = "herbType") {
                                 type = NavType.IntType
                             })
-                        ) { entry -> DetailScreen(navController, entry.arguments?.getInt("herbType")) }
+                        ) { entry ->
+                            DetailScreen(navController, entry.arguments?.getInt("herbType"))
+                        }
                     }
                 }
             }
