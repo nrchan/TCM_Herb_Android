@@ -9,13 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -74,9 +73,10 @@ fun MainScreen(navController: NavController){
     ) {
         Box(modifier = Modifier.align(Alignment.BottomCenter)){
             Column() {
+                //Explore
                 Text(
                     stringResource(R.string.main_title_explore),
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -88,10 +88,12 @@ fun MainScreen(navController: NavController){
                         HerbCard(navController,index+1)
                     }
                 }
-                Spacer(Modifier.height(48.dp))
+                Spacer(Modifier.height(36.dp))
+
+                //Identify
                 Text(
                     stringResource(R.string.main_title_identify),
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -100,12 +102,40 @@ fun MainScreen(navController: NavController){
                         if (!cameraPermissionState.status.isGranted){ cameraPermissionState.launchPermissionRequest() }
                         navController.navigate("camera")
                     },
+                    shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
-                        .padding(32.dp)
+                        .padding(horizontal = 32.dp, vertical = 8.dp)
                         .fillMaxWidth()
                 ) {
+                    Icon(painterResource(id = R.drawable.ic_round_photo_camera_24), "camera icon")
+                    Spacer(
+                        Modifier
+                            .width(8.dp)
+                            .height(48.dp))
                     Text(stringResource(R.string.main_button_camera_app), style = MaterialTheme.typography.bodyMedium)
                 }
+                TextButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.main_button_more))
+                }
+
+                //Decoration
+                Spacer(Modifier.height(36.dp))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Dot(MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(16.dp))
+                    Dot(MaterialTheme.colorScheme.secondary)
+                    Spacer(Modifier.width(16.dp))
+                    Dot(MaterialTheme.colorScheme.tertiary)
+                }
+                Spacer(Modifier.height(16.dp))
             }
         }
     }
@@ -146,4 +176,13 @@ fun HerbCard(navController: NavController, herbType: Int){
                 .offset((-4).dp, (-16).dp)
         )
     }
+}
+
+@Composable
+fun Dot(color: Color){
+    Surface(
+        shape = RoundedCornerShape(45.dp),
+        color = color,
+        modifier = Modifier.size(16.dp)
+    ){}
 }

@@ -17,4 +17,5 @@
     <string name="detail_title_scientific_name">【Scientific name】</string>
     <string name="detail_title_taste">【Taste】</string>
     <string name="detail_title_feature">【Feature】</string>
+    <string name="main_button_more">More options</string>
 </resources>
