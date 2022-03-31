@@ -217,6 +217,16 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         preview = Preview.Builder().build().also {
                             it.setSurfaceProvider(previewView.surfaceProvider)
                         }
+
+                        previewView.setOnTouchListener { view, motionEvent ->
+                            view.performClick()
+                            val meteringPoint = previewView.meteringPointFactory
+                                .createPoint(motionEvent.x, motionEvent.y)
+                            val action = FocusMeteringAction.Builder(meteringPoint).build()
+                            camera?.cameraControl?.startFocusAndMetering(action)
+                            true
+                        }
+
                         previewView
                     },
                     modifier = Modifier.fillMaxSize()
@@ -263,8 +273,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         onClick = {
                             camera?.let {
                                 isTorchOn = !isTorchOn
-                                if(isTorchOn) it.cameraControl.enableTorch(true)
-                                else it.cameraControl.enableTorch(false)
+                                it.cameraControl.enableTorch(isTorchOn)
                             }
                         },
                         color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
