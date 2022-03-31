@@ -9,12 +9,14 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import androidx.camera.core.*
+import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
@@ -26,8 +28,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -88,7 +94,8 @@ fun CameraScreen(navController: NavController){
 @OptIn(
     ExperimentalPermissionsApi::class,
     androidx.compose.animation.ExperimentalAnimationApi::class,
-    androidx.compose.material.ExperimentalMaterialApi::class
+    androidx.compose.material.ExperimentalMaterialApi::class,
+    androidx.compose.material3.ExperimentalMaterial3Api::class
 )
 @Composable
 fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit){
@@ -102,7 +109,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     val herbData = HerbData()
 
     val cameraProviderFuture = remember(context){ ProcessCameraProvider.getInstance(context) }
-    var cameraProvider = remember(cameraProviderFuture) { cameraProviderFuture.get() }
+    var cameraProvider: ProcessCameraProvider
+    var camera: Camera? by remember { mutableStateOf(null) }
     var cameraSelector: CameraSelector? by remember { mutableStateOf(null) }
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var imageBlurryAnalysis: ImageAnalysis? by remember { mutableStateOf(null) }
@@ -111,6 +119,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
     var isSaved by remember { mutableStateOf(false) }
     var resultType by remember { mutableStateOf(-1) }
+
+    var isTorchOn by remember { mutableStateOf(false) }
 
     val serverAgent = ServerAgent()
 
@@ -199,7 +209,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
                             cameraProvider = ProcessCameraProvider.getInstance(context).get()
                             cameraProvider.unbindAll()
-                            cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageBlurryAnalysis)
+                            camera = cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageBlurryAnalysis)
 
                             coroutineScope.launch(Dispatchers.Default) { serverAgent.helloWorld() }
                         }, executor)
@@ -243,6 +253,27 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                             .wrapContentSize()
                             .size(56.dp)
                     ){}
+                }
+                //torch
+                if(camera?.cameraInfo?.hasFlashUnit() == true) Box(
+                    contentAlignment = Alignment.BottomStart,
+                    modifier = Modifier.padding(start = 48.dp, bottom = 40.dp)
+                ){
+                    Surface(
+                        onClick = {
+                            camera?.let {
+                                isTorchOn = !isTorchOn
+                                if(isTorchOn) it.cameraControl.enableTorch(true)
+                                else it.cameraControl.enableTorch(false)
+                            }
+                        },
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(45.dp),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        if(isTorchOn) Image(painterResource(R.drawable.ic_round_highlight_24), "torch on icon", modifier = Modifier.size(12.dp), contentScale = ContentScale.Inside, colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSecondaryContainer), alpha = 0.7f)
+                        else Image(painterResource(id = R.drawable.ic_round_highlight_off_24), "torch off icon", modifier = Modifier.size(12.dp), contentScale = ContentScale.Inside, colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSecondaryContainer), alpha = 0.7f)
+                    }
                 }
             }
         }
