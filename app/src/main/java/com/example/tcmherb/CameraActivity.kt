@@ -33,8 +33,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -52,7 +52,6 @@ import org.opencv.core.MatOfDouble
 import org.opencv.imgproc.Imgproc
 import java.nio.ByteBuffer
 import kotlin.math.pow
-
 
 @Composable
 fun CameraScreen(navController: NavController){
@@ -148,7 +147,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                     Text(
                         if(resultType!=-1)herbData.nameZH(resultType) else stringResource(R.string.camera_bottomsheet_wait),
                         style = MaterialTheme.typography.displayMedium,
-                        color = if(resultType!=-1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
+                        color = if(resultType!=-1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline,
+                        overflow = TextOverflow.Clip,
+                        maxLines = 1
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
