@@ -27,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -71,7 +72,8 @@ fun CameraScreen(navController: NavController){
                     onClick = {},
                     modifier = Modifier.padding(start = 16.dp)
                 ) {
-                    Text("\uD83E\uDD75 Image is blurry!",
+                    Text(
+                        stringResource(R.string.camera_alert_image_blur),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -132,9 +134,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         .padding(32.dp)
                         .fillMaxWidth()
                 ) {
-                    Text("Looks like...", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.camera_bottomsheet_lookslike), style = MaterialTheme.typography.bodyLarge)
                     Text(
-                        if(resultType!=-1)herbData.nameZH(resultType) else "Please wait...",
+                        if(resultType!=-1)herbData.nameZH(resultType) else stringResource(R.string.camera_bottomsheet_wait),
                         style = MaterialTheme.typography.displayMedium,
                         color = if(resultType!=-1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline
                     )
@@ -143,11 +145,11 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         coroutineScope.launch(Dispatchers.Default) { state.hide() }
                         isSaved = false
                         navController.navigate("detail/$resultType")
-                    }, enabled = isSaved) { Text("Learn more") }
+                    }, enabled = isSaved) { Text(stringResource(R.string.camera_bottomsheet_learn)) }
                     Button(onClick = {
                         coroutineScope.launch(Dispatchers.Default) { state.hide() }
                         isSaved = false
-                    }) { Text("New photo") }
+                    }) { Text(stringResource(R.string.camera_bottomsheet_again)) }
                 }
             }
         ){
@@ -251,16 +253,16 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Text("(◍°̧̧̧o°̧̧̧◍)", textAlign = TextAlign.Center, style = MaterialTheme.typography.headlineLarge)
+            Text(stringResource(R.string.camera_permission_title), textAlign = TextAlign.Center, style = MaterialTheme.typography.headlineLarge)
             Spacer(Modifier.height(16.dp))
-            Text("No camera permission granted.", textAlign = TextAlign.Center)
+            Text(stringResource(R.string.camera_permission_description), textAlign = TextAlign.Center)
             Spacer(Modifier.height(8.dp))
             Button(onClick = {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
                 context.startActivity(intent)
             }) {
-                Text("Grant Permission", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.camera_permission_button), style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

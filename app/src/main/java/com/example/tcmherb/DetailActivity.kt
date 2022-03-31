@@ -11,6 +11,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -49,13 +50,13 @@ fun DetailScreen(navController: NavController, herbType: Int?) {
                 .padding(32.dp)
                 .fillMaxWidth()
         ) {
-            Text("【Scientific name】", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.detail_title_scientific_name), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
             Text(herbData.nameSC(index), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(24.dp))
-            Text("【Taste】", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.detail_title_taste), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
             Text(herbData.taste(index), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(24.dp))
-            Text("【Feature】", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.detail_title_feature), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
             Text(herbData.feature(index), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
         }
     }
