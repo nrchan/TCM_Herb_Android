@@ -1,9 +1,17 @@
 package com.example.tcmherb
 
 import android.Manifest
+import android.R.attr.bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
@@ -12,21 +20,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,8 +43,11 @@ import com.example.tcmherb.ui.theme.TCMHerbTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.opencv.android.OpenCVLoader
+import java.io.File
+
 
 class MainActivity : ComponentActivity(), CameraXConfig.Provider {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,9 +91,90 @@ fun MainScreen(navController: NavController){
 
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
+    val context = LocalContext.current
+
+    var openDialog by remember { mutableStateOf(false) }
+    var resultType by remember { mutableStateOf(-1) }
+    val cacheFile = File.createTempFile("testImage", null, context.cacheDir)
+
+    val serverAgent = ServerAgent()
+    val herbData = HerbData()
+
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(true){
+        coroutineScope.launch(Dispatchers.Default) { serverAgent.helloWorld() }
+    }
+
+    val deviceCameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()){
+        if(it){
+            resultType = -2
+            coroutineScope.launch(Dispatchers.IO){
+                val bitmap = BitmapFactory.decodeFile(cacheFile.path)
+                val result = serverAgent.testImage(bitmap)
+                Log.d("Connection result", "May be X${result[0].first}")
+                resultType = result[0].first
+            }
+        }
+    }
+
+    val deviceStorageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){
+        it?.let{
+            resultType = -2
+            coroutineScope.launch(Dispatchers.IO){
+                val source: ImageDecoder.Source = ImageDecoder.createSource(context.contentResolver, it)
+                val bitmap = ImageDecoder.decodeBitmap(source)
+                val result = serverAgent.testImage(bitmap)
+                Log.d("Connection result", "May be X${result[0].first}")
+                resultType = result[0].first
+            }
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        if(openDialog){
+            AlertDialog(
+                onDismissRequest = { openDialog = false },
+                icon = { Image(painterResource(R.drawable.ic_round_mood_24), "", modifier = Modifier.size(64.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)) },
+                title = { Text("Got photo elsewhere?", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Justify) },
+                text = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("You can use your device's own camera or import photos from device storage to avoid blurry problem.", textAlign = TextAlign.Center)
+                        Spacer(Modifier.height(16.dp))
+                        Box(modifier = Modifier.height(120.dp), contentAlignment = Alignment.Center){
+                            when(resultType){
+                                -1 -> {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        TextButton(
+                                            onClick = { deviceCameraLauncher.launch(FileProvider.getUriForFile(context, "com.example.tcmherb.fileprovider", cacheFile)) }
+                                        ) { Text("Open device's camera", style = MaterialTheme.typography.bodyMedium) }
+                                        TextButton(
+                                            onClick = { deviceStorageLauncher.launch(arrayOf("image/jpeg")) }
+                                        ) { Text("Use device's storage", style = MaterialTheme.typography.bodyMedium) }
+                                    }
+                                }
+                                -2 -> Text("Please wait...")
+                                else -> {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally){
+                                        Text("Looks like ${herbData.nameZH(resultType)}", style = MaterialTheme.typography.bodyLarge)
+                                        Spacer(Modifier.height(8.dp))
+                                        Button(
+                                            onClick = { navController.navigate("detail/$resultType") },
+                                            modifier = Modifier.wrapContentSize()
+                                        ) { Text("Learn more") }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { openDialog = false }) { Text("Go back") }
+                },
+                confirmButton = {}
+            )
+        }
         Box(modifier = Modifier.align(Alignment.BottomCenter)){
             Column() {
                 //Explore
@@ -129,7 +219,7 @@ fun MainScreen(navController: NavController){
                     Text(stringResource(R.string.main_button_camera_app), style = MaterialTheme.typography.bodyMedium)
                 }
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { openDialog = true },
                     modifier = Modifier
                         .padding(horizontal = 32.dp)
                         .fillMaxWidth()

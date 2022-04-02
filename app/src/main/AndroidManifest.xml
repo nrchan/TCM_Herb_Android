@@ -19,17 +19,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TCMHerb">
-        <activity
-            android:name=".DetailActivity"
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.tcmherb.fileprovider"
             android:exported="false"
-            android:label="@string/title_activity_detail"
-            android:theme="@style/Theme.TCMHerb" />
-        <activity
-            android:name=".CameraActivity"
-            android:exported="false"
-            android:label="@string/title_activity_camera"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.TCMHerb" />
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"
