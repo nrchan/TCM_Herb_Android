@@ -17,6 +17,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
@@ -29,6 +30,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,6 +53,8 @@ import org.opencv.core.Mat
 import org.opencv.core.MatOfDouble
 import org.opencv.imgproc.Imgproc
 import java.nio.ByteBuffer
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 
 @Composable
@@ -115,6 +119,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     var imageBlurryAnalysis: ImageAnalysis? by remember { mutableStateOf(null) }
     val executor = remember(context) { ContextCompat.getMainExecutor(context) }
     var preview by remember { mutableStateOf<Preview?>(null) }
+    var cameraControl : CameraControl? by remember { mutableStateOf(null) }
+    var cameraInfo : CameraInfo? by remember { mutableStateOf(null) }
+    var cameraScale by remember { mutableStateOf(1f) }
 
     var isSaved by remember { mutableStateOf(false) }
     var resultType by remember { mutableStateOf(-1) }
@@ -212,6 +219,9 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                             cameraProvider.unbindAll()
                             camera = cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageBlurryAnalysis)
 
+                            cameraControl = camera?.cameraControl
+                            cameraInfo = camera?.cameraInfo
+
                             coroutineScope.launch(Dispatchers.Default) { serverAgent.helloWorld() }
                         }, executor)
 
@@ -230,7 +240,18 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
                         previewView
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, _, zoom, _ ->
+                                cameraInfo?.let {
+                                    cameraScale *= zoom
+                                    cameraScale = min(cameraScale, it.zoomState.value!!.maxZoomRatio)
+                                    cameraScale = max(cameraScale, it.zoomState.value!!.minZoomRatio)
+                                    cameraControl?.setZoomRatio(cameraScale)
+                                }
+                            }
+                        }
                 )
                 //shutter
                 Box(contentAlignment = Alignment.BottomCenter){
