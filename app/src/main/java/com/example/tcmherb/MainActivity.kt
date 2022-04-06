@@ -1,13 +1,10 @@
 package com.example.tcmherb
 
 import android.Manifest
-import android.R.attr.bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -137,10 +134,10 @@ fun MainScreen(navController: NavController){
             AlertDialog(
                 onDismissRequest = { openDialog = false },
                 icon = { Image(painterResource(R.drawable.ic_round_mood_24), "", modifier = Modifier.size(64.dp), colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)) },
-                title = { Text("Got photo elsewhere?", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Justify) },
+                title = { Text(stringResource(R.string.main_dialog_title), style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Justify) },
                 text = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("You can use your device's own camera or import photos from device storage to avoid blurry problem.", textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.main_dialog_description), textAlign = TextAlign.Center)
                         Spacer(Modifier.height(16.dp))
                         Box(modifier = Modifier.height(120.dp), contentAlignment = Alignment.Center){
                             when(resultType){
@@ -148,21 +145,21 @@ fun MainScreen(navController: NavController){
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         TextButton(
                                             onClick = { deviceCameraLauncher.launch(FileProvider.getUriForFile(context, "com.example.tcmherb.fileprovider", cacheFile)) }
-                                        ) { Text("Open device's camera", style = MaterialTheme.typography.bodyMedium) }
+                                        ) { Text(stringResource(R.string.main_dialog_option_device_camera), style = MaterialTheme.typography.bodyMedium) }
                                         TextButton(
                                             onClick = { deviceStorageLauncher.launch(arrayOf("image/jpeg")) }
-                                        ) { Text("Use device's storage", style = MaterialTheme.typography.bodyMedium) }
+                                        ) { Text(stringResource(R.string.main_dialog_option_device_storage), style = MaterialTheme.typography.bodyMedium) }
                                     }
                                 }
-                                -2 -> Text("Please wait...")
+                                -2 -> Text(stringResource(R.string.main_dialog_text_wait))
                                 else -> {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally){
-                                        Text("Looks like ${herbData.nameZH(resultType)}", style = MaterialTheme.typography.bodyLarge)
+                                        Text(stringResource(R.string.main_dialog_result).format(herbData.nameZH(resultType)), style = MaterialTheme.typography.bodyLarge)
                                         Spacer(Modifier.height(8.dp))
                                         Button(
                                             onClick = { navController.navigate("detail/$resultType") },
                                             modifier = Modifier.wrapContentSize()
-                                        ) { Text("Learn more") }
+                                        ) { Text(stringResource(R.string.main_dialog_button_learn_more)) }
                                     }
                                 }
                             }
@@ -170,13 +167,13 @@ fun MainScreen(navController: NavController){
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { openDialog = false }) { Text("Go back") }
+                    TextButton(onClick = { openDialog = false }) { Text(stringResource(R.string.main_dialog_button_cancel)) }
                 },
                 confirmButton = {}
             )
         }
         Box(modifier = Modifier.align(Alignment.BottomCenter)){
-            Column() {
+            Column {
                 //Explore
                 Text(
                     stringResource(R.string.main_title_explore),

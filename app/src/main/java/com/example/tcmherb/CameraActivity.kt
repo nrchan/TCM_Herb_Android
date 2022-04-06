@@ -98,7 +98,7 @@ fun CameraScreen(navController: NavController){
     ExperimentalPermissionsApi::class,
     androidx.compose.animation.ExperimentalAnimationApi::class,
     androidx.compose.material.ExperimentalMaterialApi::class,
-    androidx.compose.material3.ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class
 )
 @Composable
 fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit){

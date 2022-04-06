@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">TCM Herb</string>
     <string name="title_activity_camera" translatable="false">CameraActivity</string>
     <string name="title_activity_result" translatable="false">ResultActivity</string>
@@ -7,8 +7,8 @@
     <string name="main_title_identify">Identify</string>
     <string name="main_button_camera_app">Take Photo</string>
     <string name="camera_alert_image_blur">🥵  Image is blurry!</string>
-    <string name="camera_bottomsheet_lookslike">Looks like...</string>
-    <string name="camera_bottomsheet_wait">Please wait...</string>
+    <string name="camera_bottomsheet_lookslike" tools:ignore="TypographyEllipsis">Looks like...</string>
+    <string name="camera_bottomsheet_wait" tools:ignore="TypographyEllipsis">Please wait...</string>
     <string name="camera_bottomsheet_learn">Learn more</string>
     <string name="camera_bottomsheet_again">New photo</string>
     <string name="camera_permission_description">No camera permission granted.</string>
@@ -18,4 +18,12 @@
     <string name="detail_title_taste">【Taste】</string>
     <string name="detail_title_feature">【Feature】</string>
     <string name="main_button_more">More options</string>
+    <string name="main_dialog_title">Got photo elsewhere?</string>
+    <string name="main_dialog_description">You can use your device\'s own camera or import photos from local storage to avoid blurry problem.</string>
+    <string name="main_dialog_option_device_camera">Open device\'s camera</string>
+    <string name="main_dialog_option_device_storage">Use device\'s storage</string>
+    <string name="main_dialog_text_wait" tools:ignore="TypographyEllipsis">Please wait...</string>
+    <string name="main_dialog_button_learn_more">Learn more</string>
+    <string name="main_dialog_button_cancel">Go back</string>
+    <string name="main_dialog_result">Looks like %1$s</string>
 </resources>

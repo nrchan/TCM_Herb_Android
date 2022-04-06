@@ -3,7 +3,7 @@ package com.example.tcmherb
 class HerbData {
     fun nameZH(index: Int) = herbNameChinese[if(index < 0) 0 else index]
 
-    fun nameZHnl(index: Int) = herbNameChinese_newline[if(index < 0) 0 else index]
+    fun nameZHnl(index: Int) = herbNameChineseNewline[if(index < 0) 0 else index]
 
     fun nameEN(index: Int) = herbNameEnglish[if(index < 0) 0 else index]
 
@@ -58,7 +58,7 @@ class HerbData {
         "桑寄生"
     )
 
-    private val herbNameChinese_newline = arrayOf(
+    private val herbNameChineseNewline = arrayOf(
         "中文名稱",
         "黃苓",//黃芩?
         "熟地黃",
