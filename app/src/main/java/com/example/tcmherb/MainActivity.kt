@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,6 +41,9 @@ import com.example.tcmherb.ui.theme.TCMHerbTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opencv.android.OpenCVLoader
@@ -151,15 +155,27 @@ fun MainScreen(navController: NavController){
                                         ) { Text(stringResource(R.string.main_dialog_option_device_storage), style = MaterialTheme.typography.bodyMedium) }
                                     }
                                 }
-                                -2 -> Text(stringResource(R.string.main_dialog_text_wait))
                                 else -> {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally){
-                                        Text(stringResource(R.string.main_dialog_result).format(herbData.nameZH(resultType)), style = MaterialTheme.typography.bodyLarge)
-                                        Spacer(Modifier.height(8.dp))
-                                        Button(
-                                            onClick = { navController.navigate("detail/$resultType") },
-                                            modifier = Modifier.wrapContentSize()
-                                        ) { Text(stringResource(R.string.main_dialog_button_learn_more)) }
+                                        Text(
+                                            stringResource(R.string.main_dialog_result).format(herbData.nameZH(resultType)),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            modifier = Modifier.placeholder(
+                                                visible = resultType==-2,
+                                                color = MaterialTheme.colorScheme.outline,
+                                                shape = RoundedCornerShape(8.dp),
+                                                highlight = PlaceholderHighlight.shimmer(),
+                                                placeholderFadeTransitionSpec = { TweenSpec(300) },
+                                                contentFadeTransitionSpec = { TweenSpec(300) }
+                                            )
+                                        )
+                                        if(resultType >= 0){
+                                            Spacer(Modifier.height(8.dp))
+                                            Button(
+                                                onClick = { navController.navigate("detail/$resultType") },
+                                                modifier = Modifier.wrapContentSize()
+                                            ) { Text(stringResource(R.string.main_dialog_button_learn_more)) }
+                                        }
                                     }
                                 }
                             }

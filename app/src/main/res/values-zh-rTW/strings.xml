@@ -6,7 +6,6 @@
     <string name="camera_alert_image_blur">🥵  影像太模糊了！</string>
     <string name="camera_bottomsheet_lookslike" tools:ignore="TypographyEllipsis">看起來像...</string>
     <string name="camera_bottomsheet_again">拍攝新照片</string>
-    <string name="camera_bottomsheet_wait" tools:ignore="TypographyEllipsis">請稍等...</string>
     <string name="camera_bottomsheet_learn">進一步了解</string>
     <string name="camera_permission_description">沒有相機權限。</string>
     <string name="camera_permission_title">(◍°̧̧̧o°̧̧̧◍)</string>
@@ -18,7 +17,6 @@
     <string name="main_dialog_button_cancel">返回</string>
     <string name="main_dialog_result">看起來像%1$s</string>
     <string name="main_dialog_button_learn_more">進一步了解</string>
-    <string name="main_dialog_text_wait" tools:ignore="TypographyEllipsis">請稍等...</string>
     <string name="main_dialog_option_device_camera">使用裝置相機</string>
     <string name="main_dialog_option_device_storage">使用本地照片</string>
     <string name="main_dialog_title">要嘗試其他方法嗎？</string>

@@ -7,12 +7,14 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
+import android.transition.Transition
 import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
@@ -45,6 +47,10 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.fade
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opencv.core.Core
@@ -151,12 +157,22 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                         .fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.camera_bottomsheet_lookslike), style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        if(resultType!=-1)herbData.nameZH(resultType) else stringResource(R.string.camera_bottomsheet_wait),
+                        herbData.nameZH(resultType),
                         style = MaterialTheme.typography.displayMedium,
-                        color = if(resultType!=-1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.outline,
+                        color = MaterialTheme.colorScheme.onBackground,
                         overflow = TextOverflow.Clip,
-                        maxLines = 1
+                        maxLines = 1,
+                        modifier = Modifier
+                            .placeholder(
+                                visible = resultType==-1,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = RoundedCornerShape(24.dp),
+                                highlight = PlaceholderHighlight.shimmer(),
+                                placeholderFadeTransitionSpec = { TweenSpec(300) },
+                                contentFadeTransitionSpec = { TweenSpec(300) }
+                            )
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
@@ -246,8 +262,10 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                             detectTransformGestures { _, _, zoom, _ ->
                                 cameraInfo?.let {
                                     cameraScale *= zoom
-                                    cameraScale = min(cameraScale, it.zoomState.value!!.maxZoomRatio)
-                                    cameraScale = max(cameraScale, it.zoomState.value!!.minZoomRatio)
+                                    cameraScale =
+                                        min(cameraScale, it.zoomState.value!!.maxZoomRatio)
+                                    cameraScale =
+                                        max(cameraScale, it.zoomState.value!!.minZoomRatio)
                                     cameraControl?.setZoomRatio(cameraScale)
                                 }
                             }
