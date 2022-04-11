@@ -70,7 +70,7 @@ fun TCMHerbTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
-    val colors = if (useDarkTheme) LightThemeColors else DarkThemeColors
+    val colors = if (useDarkTheme) DarkThemeColors else LightThemeColors
 
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(colors.background)

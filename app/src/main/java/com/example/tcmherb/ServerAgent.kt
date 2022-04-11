@@ -10,6 +10,7 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 
 class ServerAgent {
@@ -45,8 +46,19 @@ class ServerAgent {
             .build()
         try {
             Log.d("Connection", "Processing image")
+            val width = bitmap.width
+            val height = bitmap.height
+            val widthIsSmaller = width < height
+            val newSize = min(width, height)
+            val newBitmap = Bitmap.createBitmap(
+                bitmap,
+                if(widthIsSmaller) 0 else (width-newSize)/2,
+                if(widthIsSmaller) (height-newSize)/2 else 0,
+                newSize,
+                newSize
+            )
             val byteArrayOS = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOS)
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOS)
             val encodedBitmap = Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT)
 
             val jsonParam = JSONObject()
