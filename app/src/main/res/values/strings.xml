@@ -1,8 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">TCM Herb</string>
-    <string name="title_activity_camera" translatable="false">CameraActivity</string>
-    <string name="title_activity_result" translatable="false">ResultActivity</string>
-    <string name="title_activity_detail" translatable="false">DetailActivity</string>
     <string name="main_title_explore">Explore</string>
     <string name="main_title_identify">Identify</string>
     <string name="main_button_camera_app">Take Photo</string>

@@ -7,7 +7,6 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.provider.Settings
-import android.transition.Transition
 import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.core.Camera
@@ -48,7 +47,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import kotlinx.coroutines.Dispatchers
