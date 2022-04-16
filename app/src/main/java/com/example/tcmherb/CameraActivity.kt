@@ -49,6 +49,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
+import com.google.mlkit.common.model.LocalModel
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opencv.core.Core
@@ -120,7 +124,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     var camera: Camera? by remember { mutableStateOf(null) }
     var cameraSelector: CameraSelector? by remember { mutableStateOf(null) }
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
-    var imageBlurryAnalysis: ImageAnalysis? by remember { mutableStateOf(null) }
+    var imageAnalyzer: ImageAnalysis? by remember { mutableStateOf(null) }
     val executor = remember(context) { ContextCompat.getMainExecutor(context) }
     var preview by remember { mutableStateOf<Preview?>(null) }
     var cameraControl : CameraControl? by remember { mutableStateOf(null) }
@@ -133,6 +137,20 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     var isTorchOn by remember { mutableStateOf(false) }
 
     val serverAgent = ServerAgent()
+
+    //object detection
+    /**
+    val localModel = LocalModel.Builder()
+        .setAssetFilePath("model.tflite")
+        .build()
+    val customObjectDetectorOptions = CustomObjectDetectorOptions.Builder(localModel)
+        .setDetectorMode(CustomObjectDetectorOptions.STREAM_MODE)
+        .enableClassification()
+        .setClassificationConfidenceThreshold(0.0f)
+        .setMaxPerObjectLabelCount(3)
+        .build()
+    val objectDetector = ObjectDetection.getClient(customObjectDetectorOptions)
+    **/
 
     if(cameraPermissionState.status.isGranted){
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, confirmStateChange = {
@@ -203,11 +221,11 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                             imageCapture = ImageCapture.Builder()
                                 .build()
 
-                            imageBlurryAnalysis = ImageAnalysis.Builder()
+                            imageAnalyzer = ImageAnalysis.Builder()
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                                 .build()
 
-                            imageBlurryAnalysis!!.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
+                            imageAnalyzer!!.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
                                 imageProxy.image?.let {
                                     val matImage = convertYUVtoMat(it)
 
@@ -224,6 +242,17 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                     val blur = (std[0, 0][0]).pow(2)
                                     //Log.d("Blur", "$blur $isSaved")
                                     showBlurWarning(blur <= 60 && !isSaved)
+
+
+                                    //Object detection
+                                    /**
+                                    val inputImage = InputImage.fromMediaImage(it, imageProxy.imageInfo.rotationDegrees)
+                                    objectDetector
+                                        .process(inputImage)
+                                        .addOnSuccessListener { list ->
+                                            Log.d("Object detection", "!!!")
+                                        }
+                                    **/
                                 }
 
                                 imageProxy.close()
@@ -231,7 +260,7 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
 
                             cameraProvider = ProcessCameraProvider.getInstance(context).get()
                             cameraProvider.unbindAll()
-                            camera = cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageBlurryAnalysis)
+                            camera = cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector!!, preview, imageCapture, imageAnalyzer)
 
                             cameraControl = camera?.cameraControl
                             cameraInfo = camera?.cameraInfo
