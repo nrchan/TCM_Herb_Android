@@ -49,10 +49,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
-import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.ObjectDetection
-import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.opencv.core.Core
@@ -137,20 +133,6 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
     var isTorchOn by remember { mutableStateOf(false) }
 
     val serverAgent = ServerAgent()
-
-    //object detection
-    /**
-    val localModel = LocalModel.Builder()
-        .setAssetFilePath("model.tflite")
-        .build()
-    val customObjectDetectorOptions = CustomObjectDetectorOptions.Builder(localModel)
-        .setDetectorMode(CustomObjectDetectorOptions.STREAM_MODE)
-        .enableClassification()
-        .setClassificationConfidenceThreshold(0.0f)
-        .setMaxPerObjectLabelCount(3)
-        .build()
-    val objectDetector = ObjectDetection.getClient(customObjectDetectorOptions)
-    **/
 
     if(cameraPermissionState.status.isGranted){
         val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, confirmStateChange = {
@@ -243,16 +225,6 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                     //Log.d("Blur", "$blur $isSaved")
                                     showBlurWarning(blur <= 60 && !isSaved)
 
-
-                                    //Object detection
-                                    /**
-                                    val inputImage = InputImage.fromMediaImage(it, imageProxy.imageInfo.rotationDegrees)
-                                    objectDetector
-                                        .process(inputImage)
-                                        .addOnSuccessListener { list ->
-                                            Log.d("Object detection", "!!!")
-                                        }
-                                    **/
                                 }
 
                                 imageProxy.close()
