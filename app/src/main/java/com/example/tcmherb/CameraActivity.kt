@@ -273,6 +273,8 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                 Box(contentAlignment = Alignment.BottomCenter){
                     Button(
                         onClick = {
+                            isTorchOn = false
+                            camera?.cameraControl?.enableTorch(isTorchOn)
                             imageCapture?.takePicture(ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageCapturedCallback() {
                                     override fun onCaptureSuccess(imageProxy: ImageProxy) {

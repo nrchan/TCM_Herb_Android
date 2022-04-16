@@ -3,10 +3,16 @@ package com.example.tcmherb
 import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Log
-import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import org.opencv.android.Utils
+import org.opencv.core.*
+import org.opencv.core.Core.split
+import org.opencv.imgproc.Imgproc
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -57,6 +63,7 @@ class ServerAgent {
                 newSize,
                 newSize
             )
+
             val byteArrayOS = ByteArrayOutputStream()
             newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOS)
             val encodedBitmap = Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT)
