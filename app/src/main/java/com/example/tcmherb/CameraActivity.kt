@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -208,23 +209,25 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                                 .build()
 
                             imageAnalyzer!!.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
-                                imageProxy.image?.let {
-                                    val matImage = convertYUVtoMat(it)
+                                if(!state.isVisible){
+                                    imageProxy.image?.let {
+                                        val matImage = convertYUVtoMat(it)
 
-                                    //use laplacian kernel to convolve in order to detect blurry image
-                                    val destination = Mat()
-                                    val matGray = Mat()
-                                    Imgproc.cvtColor(matImage, matGray, Imgproc.COLOR_BGR2GRAY)
-                                    Imgproc.Laplacian(matGray, destination, 3)
-                                    val median = MatOfDouble()
-                                    val std = MatOfDouble()
-                                    Core.meanStdDev(destination, median, std)
+                                        //use laplacian kernel to convolve in order to detect blurry image
+                                        val destination = Mat()
+                                        val matGray = Mat()
+                                        Imgproc.cvtColor(matImage, matGray, Imgproc.COLOR_BGR2GRAY)
+                                        Imgproc.Laplacian(matGray, destination, 3)
+                                        val median = MatOfDouble()
+                                        val std = MatOfDouble()
+                                        Core.meanStdDev(destination, median, std)
 
-                                    //the higher the number, the clearer the photo
-                                    val blur = (std[0, 0][0]).pow(2)
-                                    //Log.d("Blur", "$blur $isSaved")
-                                    showBlurWarning(blur <= 60 && !isSaved)
+                                        //the higher the number, the clearer the photo
+                                        val blur = (std[0, 0][0]).pow(2)
+                                        //Log.d("Blur", "$blur $isSaved")
+                                        showBlurWarning(blur <= 60 && !isSaved)
 
+                                    }
                                 }
 
                                 imageProxy.close()
@@ -274,8 +277,6 @@ fun CameraView(navController: NavController, showBlurWarning: (Boolean) -> Unit)
                 Box(contentAlignment = Alignment.BottomCenter){
                     Button(
                         onClick = {
-                            isTorchOn = false
-                            camera?.cameraControl?.enableTorch(isTorchOn)
                             imageCapture?.takePicture(ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageCapturedCallback() {
                                     override fun onCaptureSuccess(imageProxy: ImageProxy) {

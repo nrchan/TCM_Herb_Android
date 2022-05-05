@@ -183,7 +183,10 @@ fun MainScreen(navController: NavController){
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { openDialog = false }) { Text(stringResource(R.string.main_dialog_button_cancel)) }
+                    TextButton(onClick = {
+                        openDialog = false
+                        resultType = -1
+                    }) { Text(stringResource(R.string.main_dialog_button_cancel)) }
                 },
                 confirmButton = {}
             )
