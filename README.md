@@ -1,4 +1,4 @@
-## TCM_Herb_Android
+# TCM_Herb_Android
 
 This is for the traditional chinese medicine course.
 
@@ -12,7 +12,7 @@ In order to make this app really work, please also set up the [server](https://g
 You can follow the readme there and set up the server.
 
 When you're done, remember to change the url in ```ServerAgent.kt``` to yours.
-(it's somewhere in the app, you can find it easily in android studio when you set Project's hierarchy view to "Android")
+(it's somewhere in this code, you can find it easily in android studio when you set Project's hierarchy view to "Android")
 
 ```kotlin
 //In ServerAgent.kt
