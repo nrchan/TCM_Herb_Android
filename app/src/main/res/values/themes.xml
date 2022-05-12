@@ -3,5 +3,6 @@
 
     <style name="Theme.TCMHerb" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:windowSplashScreenBackground">@color/icon_background</item>
     </style>
 </resources>
