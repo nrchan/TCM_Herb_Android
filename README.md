@@ -22,7 +22,7 @@ private val testURL = URL(/*your url here*/ + "test")
 
 ## Screenshots
 
-#### Home view and detail view
+#### Home view and Detail view
 
 Home page | Detail page
 :-:|:-:
