@@ -19,3 +19,7 @@ When you're done, remember to change the url in ```ServerAgent.kt``` to yours.
 private val helloWorldURL = URL(/*your url here*/)
 private val testURL = URL(/*your url here*/ + "test")
 ```
+
+## Screenshot
+
+<img src="./img/Report_main_page.jpg" alt="Main page" width="400"> 
