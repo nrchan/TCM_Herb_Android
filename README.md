@@ -20,6 +20,16 @@ private val helloWorldURL = URL(/*your url here*/)
 private val testURL = URL(/*your url here*/ + "test")
 ```
 
-## Screenshot
+## Screenshots
 
-<img src="./img/Report_main_page.jpg" alt="Main page" width="400"> 
+#### Home view and detail view
+
+Home page | Detail page
+:-:|:-:
+<img src="./img/Report_main_page.png" alt="Home page" width="200"> | <img src="./img/Report_detail_page.png" alt="Detail page" width="200"> 
+
+#### Identifying steps in Camera view
+
+Take a photo | Identify | Get result
+:-:|:-:|:-:
+<img src="./img/Report_camera_view.png" alt="Take a photo" width="200"> | <img src="./img/Report_camera_send.png" alt="Identify" width="200"> | <img src="./img/Report_camera_result.png" alt="Get result" width="200">
